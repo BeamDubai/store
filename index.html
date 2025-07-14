@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ร้านขายสินค้า</title>
+</head>
+<body>
+  <h1>สินค้าทั้งหมด</h1>
+  <div id="product-list"></div>
+
+  <script>
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('product-list');
+        data.forEach(product => {
+          const item = document.createElement('div');
+          item.innerHTML = `
+            <h3>${product.name}</h3>
+            <p>${product.price} บาท</p>
+            <button onclick="addToCart(${product.id})">เพิ่มลงตะกร้า</button>
+          `;
+          list.appendChild(item);
+        });
+      });
+
+    function addToCart(id) {
+      fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+    }
+  </script>
+</body>
+</html>
