@@ -1,0 +1,147 @@
+body {
+  font-family: 'Segoe UI', 'Prompt', Arial, sans-serif;
+  background: #f5f6fa;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  color: #1a1a1a;
+  text-align: center;
+  margin-top: 30px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+#product-list {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 24px;
+  margin: 40px auto 0 auto;
+  max-width: 1200px;
+  justify-content: center;
+}
+
+@media (max-width: 1200px) {
+  #product-list {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 800px;
+  }
+}
+
+@media (max-width: 800px) {
+  #product-list {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 500px) {
+  #product-list {
+    grid-template-columns: 1fr;
+    max-width: 100vw;
+    gap: 12px;
+    margin: 20px auto 0 auto;
+  }
+}
+
+#banner-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+  margin-bottom: 24px;
+}
+.banner-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: none;
+}
+.banner-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.4;
+  cursor: pointer;
+  margin-right: 4px;
+}
+
+#product-list div {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+  padding: 24px 20px 18px 20px;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+  border: 1px solid #ececec;
+}
+
+#product-list div:hover {
+  box-shadow: 0 6px 24px rgba(52,152,219,0.15);
+  border-color: #3399ff;
+}
+
+#product-list h3 {
+  margin: 0 0 10px 0;
+  color: #222;
+  font-size: 1.2em;
+  font-weight: 600;
+  text-align: center;
+}
+
+#product-list p {
+  margin: 0 0 16px 0;
+  color: #ff5722;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+button {
+  background: linear-gradient(90deg, #3399ff 0%, #0052cc 100%);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(52,152,219,0.08);
+  transition: background 0.2s, transform 0.1s;
+  outline: none;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #0052cc 0%, #3399ff 100%);
+  transform: translateY(-2px) scale(1.04);
+}
+
+input[type="text"], input[type="password"] {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ececec;
+  font-size: 1em;
+  margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#cart-modal ul li {
+  padding: 8px 0;
+  border-bottom: 1px solid #ececec;
+  font-size: 1.05em;
+}
+
+#cart-modal ul li:last-child {
+  border-bottom: none;
+}
