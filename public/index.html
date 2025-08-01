@@ -122,9 +122,9 @@
               cartList.innerHTML += `<li style='display:flex;justify-content:space-between;align-items:center;'>
                 <span>${product ? product.name : 'สินค้า #' + item.id}</span>
                 <div style='display:flex;align-items:center;gap:6px;'>
-                  <button onclick="changeQty(${item.id},-1)" style='background:#eee;color:#222;border:none;padding:2px 10px;border-radius:12px;cursor:pointer;font-size:1.1em;'>-</button>
-                  <span style='min-width:24px;display:inline-block;text-align:center;'>${item.qty}</span>
-                  <button onclick="changeQty(${item.id},1)" style='background:#eee;color:#222;border:none;padding:2px 10px;border-radius:12px;cursor:pointer;font-size:1.1em;'>+</button>
+                  <button onclick="cartModalChangeQty(${item.id},-1)" style='background:#eee;color:#222;border:none;padding:2px 10px;border-radius:12px;cursor:pointer;font-size:1.1em;'>-</button>
+                  <span id="cart-modal-qty-${item.id}" style='min-width:24px;display:inline-block;text-align:center;'>${item.qty}</span>
+                  <button onclick="cartModalChangeQty(${item.id},1)" style='background:#eee;color:#222;border:none;padding:2px 10px;border-radius:12px;cursor:pointer;font-size:1.1em;'>+</button>
                 </div>
               </li>`;
             });
@@ -133,6 +133,22 @@
         });
     };
     function changeQty(id, delta) {
+      // อัปเดตจำนวนใน UI ทันที (เฉพาะหน้า index)
+      const qtySpan = document.getElementById('qty-' + id);
+      let currentQty = parseInt(qtySpan.textContent, 10) || 0;
+      let newQty = currentQty + delta;
+      if (newQty < 0) newQty = 0;
+      qtySpan.textContent = newQty;
+      if (newQty > 0) {
+        document.getElementById('qty-controls-' + id).style.display = 'flex';
+        document.getElementById('add-btn-' + id).style.display = 'none';
+        document.getElementById('ok-btn-' + id).style.display = '';
+      } else {
+        document.getElementById('qty-controls-' + id).style.display = 'none';
+        document.getElementById('add-btn-' + id).style.display = '';
+        document.getElementById('ok-btn-' + id).style.display = 'none';
+      }
+      // อัปเดตเซิร์ฟเวอร์และ cart count
       if (delta > 0) {
         fetch('/api/cart', {
           method: 'POST',
@@ -140,21 +156,6 @@
           body: JSON.stringify({ id })
         }).then(() => {
           updateCartCount();
-          fetch('/api/cart')
-            .then(res => res.json())
-            .then(cartData => {
-              const cartItem = (cartData.cart || []).find(i => i.id === id);
-              document.getElementById('qty-' + id).textContent = cartItem ? cartItem.qty : 0;
-              if (cartItem && cartItem.qty > 0) {
-                document.getElementById('qty-controls-' + id).style.display = 'flex';
-                document.getElementById('add-btn-' + id).style.display = 'none';
-                document.getElementById('ok-btn-' + id).style.display = '';
-              } else {
-                document.getElementById('qty-controls-' + id).style.display = 'none';
-                document.getElementById('add-btn-' + id).style.display = '';
-                document.getElementById('ok-btn-' + id).style.display = 'none';
-              }
-            });
         });
       } else {
         fetch('/api/cart/item', {
@@ -163,28 +164,50 @@
           body: JSON.stringify({ id })
         }).then(() => {
           updateCartCount();
-          fetch('/api/cart')
-            .then(res => res.json())
-            .then(cartData => {
-              const cartItem = (cartData.cart || []).find(i => i.id === id);
-              document.getElementById('qty-' + id).textContent = cartItem ? cartItem.qty : 0;
-              if (cartItem && cartItem.qty > 0) {
-                document.getElementById('qty-controls-' + id).style.display = 'flex';
-                document.getElementById('add-btn-' + id).style.display = 'none';
-                document.getElementById('ok-btn-' + id).style.display = '';
-              } else {
-                document.getElementById('qty-controls-' + id).style.display = 'none';
-                document.getElementById('add-btn-' + id).style.display = '';
-                document.getElementById('ok-btn-' + id).style.display = 'none';
-              }
-            });
+        });
+      }
+    }
+
+    // สำหรับ cart modal เท่านั้น ไม่กระทบ index
+    function cartModalChangeQty(id, delta) {
+      const qtySpan = document.getElementById('cart-modal-qty-' + id);
+      let currentQty = parseInt(qtySpan.textContent, 10) || 0;
+      let newQty = currentQty + delta;
+      if (newQty < 0) newQty = 0;
+      // อัปเดตเซิร์ฟเวอร์
+      if (delta > 0) {
+        fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        }).then(() => {
+          updateCartCount();
+          qtySpan.textContent = newQty;
+          if (newQty === 0) {
+            // รีเฟรช cart modal ถ้าจำนวนเป็น 0
+            document.getElementById('cart-btn').onclick();
+          }
+        });
+      } else {
+        fetch('/api/cart/item', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        }).then(() => {
+          updateCartCount();
+          qtySpan.textContent = newQty;
+          if (newQty === 0) {
+            // รีเฟรช cart modal ถ้าจำนวนเป็น 0
+            document.getElementById('cart-btn').onclick();
+          }
         });
       }
     }
     function okQty(id) {
       document.getElementById('qty-controls-' + id).style.display = 'none';
       document.getElementById('ok-btn-' + id).style.display = 'none';
-      // ไม่ต้องซ่อน add-btn เพราะ qty > 0 อยู่แล้ว
+      document.getElementById('add-btn-' + id).style.display = '';
+      // แสดงปุ่มเพิ่มลงตะกร้ากลับมา
     }
     function closeCart() {
       document.getElementById('cart-modal').style.display = 'none';
