@@ -19,17 +19,22 @@ function addToCart(req, res) {
 }
 
 function removeFromCart(req, res) {
-    const { id } = req.body;
+    const { id, removeAll } = req.body;
     if (!id) {
         return res.status(400).json({ success: false, error: 'No product id provided.' });
     }
-    // ลดจำนวน ถ้าเหลือ 1 ให้ลบออก
-    const item = cart.find(i => i.id === id);
-    if (item) {
-        if (item.qty > 1) {
-            item.qty -= 1;
-        } else {
-            cart = cart.filter(i => i.id !== id);
+    if (removeAll) {
+        // ลบชนิดสินค้าทั้งหมดออกจากตะกร้า
+        cart = cart.filter(i => i.id !== id);
+    } else {
+        // ลดจำนวน ถ้าเหลือ 1 ให้ลบออก
+        const item = cart.find(i => i.id === id);
+        if (item) {
+            if (item.qty > 1) {
+                item.qty -= 1;
+            } else {
+                cart = cart.filter(i => i.id !== id);
+            }
         }
     }
     res.json({ success: true, cart });
